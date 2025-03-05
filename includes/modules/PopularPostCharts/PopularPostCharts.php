@@ -99,16 +99,13 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 	{
 		$saved_post_types = get_option('tp_divi_post_types', []);
 		$saved_post_types_with_keys = array_combine($saved_post_types, array_map('ucfirst', $saved_post_types));
-		$all_types_tab_slug    = 'demo';
+		$saved_post_types_with_keys=array('post'=>'post');
 		return array(
 			'filter'                  => array(
 				'label'            => esc_html__('Filter', 'tp-divi-popular-posts'),
 				'type'             => 'select',
 				'option_category'  => 'configuration',
 				'options'          => array(
-					'today' => esc_html__("Today", 'tp-divi-popular-posts'),
-					'weekly'  => esc_html__('Weekly', 'tp-divi-popular-posts'),
-					'monthly'  => esc_html__('Monthly', 'tp-divi-popular-posts'),
 					'yearly'  => esc_html__('Yearly', 'tp-divi-popular-posts'),
 				),
 
@@ -122,7 +119,6 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'layout1' => esc_html__("Layout 1", 'tp-divi-popular-posts'),
-					'layout2'  => esc_html__('Layout 2', 'tp-divi-popular-posts'),
 				),
 				'description'      => esc_html__('Select the style of graphic charts.', 'tp-divi-popular-posts'),
 				'toggle_slug'      => 'charts_setting',
@@ -649,6 +645,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 		} else {
 			echo "Please Select Post Types first from admin settings.";
 		}
+		$selected_post_types=array('post');
 		$post_types = $this->props['type_settings'];
 		if (isset($attrs['type_settings'])) {
 			$post_types = $attrs['type_settings'];
@@ -743,7 +740,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			}
 			$args = array_merge($selected_post_types, $date_args, [$limit]);
 			// phpcs:ignore
-			$popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE pv.post_type IN ($placeholders) AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d",...$args));
+			$popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d",...$args));
 			// Display the results
 			$total_views_sum = array_sum(array_column($popular_posts, 'total_views'));
 			// echo "<pre>";

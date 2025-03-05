@@ -657,6 +657,7 @@ class TP_Popular_Posts extends ET_Builder_Module
 		} else {
 			echo "Please Select Post Types first from admin settings.";
 		}
+		$selected_post_types=array('post');
 		$post_types = $this->props['type_settings'];
 		if (isset($attrs['type_settings'])) {
 			$post_types = $attrs['type_settings'];
@@ -766,7 +767,7 @@ class TP_Popular_Posts extends ET_Builder_Module
 			$args = array_merge($selected_post_types, $date_args, [$limit]);
 			// Execute the query
 			// phpcs:ignore
-			$popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE pv.post_type IN ($placeholders) AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d",...$args));
+			$popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d",...$args));
 			//var_dump($args);
 			// Display the results
 			if (!empty($popular_posts)) {

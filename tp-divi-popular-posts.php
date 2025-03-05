@@ -2,7 +2,7 @@
 /*
 Plugin Name: Popular Posts for Divi - Free
 Plugin URI:  https://trustyplugins.com
-Description: A popular posts module for Divi with analytics dashboard.
+Description: A popular posts module for Divi with analytics dashboard and charts.
 Version:     1.0
 Author:      Trusty Plugins
 Author URI:  https://trustyplugins.net
@@ -17,7 +17,7 @@ the Free Software Foundation, either version 2 of the License, or
 any later version.
 
 You should have received a copy of the GNU General Public License
-along with Timeline Module For Divi. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
+along with Popular Posts for Divi - Free. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
  */
 if (! defined('ABSPATH')) exit; // Exit if accessed directly 
 

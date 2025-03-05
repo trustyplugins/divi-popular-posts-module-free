@@ -177,11 +177,9 @@ function tp_render_popular_posts_charts($request)
             break;
     }
 
-    // SQL query to get popular posts
-    $args = array_merge($selected_post_types, [$posts_number]);
-
+    $args = [$posts_number];
     // phpcs:ignore
-    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE pv.post_type IN ($placeholders) AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
+    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
 
     $total_views_sum = array_sum(array_column($popular_posts, 'total_views'));
     // Define default excerpt length
@@ -250,7 +248,7 @@ function tp_render_popular_posts($request)
     if (empty($selected_post_types)) {
         return wp_send_json($data); // No post types selected, return empty response
     }
-
+    $selected_post_types = ['post'];
     // Default filter and posts number
     $selected_filter = $attributes['filter'] ?? 'all';
     $posts_number = isset($attributes['posts_number']) ? absint($attributes['posts_number']) : 5;
@@ -287,10 +285,10 @@ function tp_render_popular_posts($request)
     }
 
     // SQL query to get popular posts
-    $args = array_merge($selected_post_types, [$posts_number]);
+    $args = [$posts_number];
 
     // phpcs:ignore
-    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE pv.post_type IN ($placeholders) AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
+    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
 
     // Define default excerpt length
     $excerpt_length = isset($attributes['excerpt_length']) ? absint($attributes['excerpt_length']) : 20;
@@ -411,6 +409,7 @@ function get_sql_results($attr, $posts_number = 20, $filter = 'no-filter')
 
     // Prepare values
     $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = ['post'];
     list($start_date, $end_date)  = get_date_range($attr);
 
     // Prepare the placeholders for the post types
@@ -425,7 +424,7 @@ function get_sql_results($attr, $posts_number = 20, $filter = 'no-filter')
             SUM(pv.view_count) AS total_views
         FROM {$wpdb->prefix}post_views_tp pv
         INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID
-        WHERE pv.post_type IN ($placeholders)
+        WHERE p.post_type IN ($placeholders)
           AND p.post_status = 'publish'
     ";
 
@@ -462,6 +461,7 @@ function get_views_by_date($attr)
 
     // Prepare values
     $selected_post_types = get_selected_post_types($attr); // Get post types
+    $selected_post_types = ['post'];
     list($start_date, $end_date)  = get_date_range($attr);       // Get date range
 
     // Prepare placeholders for selected post types
@@ -471,7 +471,7 @@ function get_views_by_date($attr)
     $args = array_merge($selected_post_types, [$start_date, $end_date]);
     // Execute the query and return results
     // phpcs:ignore
-    return $wpdb->get_results($wpdb->prepare("SELECT DATE(pv.view_date) AS view_date, SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE pv.post_type IN ($placeholders) AND p.post_status = 'publish' AND DATE(pv.view_date) BETWEEN %s AND %s GROUP BY DATE(pv.view_date) ORDER BY view_date ASC", ...$args), ARRAY_A);
+    return $wpdb->get_results($wpdb->prepare("SELECT DATE(pv.view_date) AS view_date, SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type IN ($placeholders) AND p.post_status = 'publish' AND DATE(pv.view_date) BETWEEN %s AND %s GROUP BY DATE(pv.view_date) ORDER BY view_date ASC", ...$args), ARRAY_A);
 }
 
 
@@ -493,6 +493,7 @@ function get_filtered_views_count($attr)
     global $wpdb;
     // Prepare values
     $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = ['post'];
     list($start_date, $end_date)  = get_date_range($attr);
     $placeholders = prepare_placeholders($selected_post_types);
     // Build SQL query for filtered views
@@ -531,13 +532,14 @@ function get_filtered_posts_count($attr)
     global $wpdb;
     // Get the selected post types (can be passed as a comma-separated string in $attr)
     $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = ['post'];
     list($start_date, $end_date)  = get_date_range($attr);
     $placeholders = prepare_placeholders($selected_post_types);
     // Prepare arguments for the query
     $args = array_merge($selected_post_types, [$start_date, $end_date]);
     // Execute the query and return the count
     // phpcs:ignore
-    $total_posts_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(DISTINCT pv.post_id) FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_status = 'publish' AND pv.post_type IN ($placeholders) AND DATE(pv.view_date) BETWEEN %s AND %s", ...$args));
+    $total_posts_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(DISTINCT pv.post_id) FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_status = 'publish' AND p.post_type IN ($placeholders) AND DATE(pv.view_date) BETWEEN %s AND %s", ...$args));
 
     return (int)$total_posts_count;
 }
@@ -552,15 +554,16 @@ function get_last_month_views_count($attr)
     $last_day_last_month = date('Y-m-t', strtotime('last day of last month'));
     // phpcs:ignore
     $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = ['post'];
     //$placeholders = prepare_placeholders($selected_post_types);
     if (count($selected_post_types) === 1) {
         // Single post type condition
-        $post_type_condition = $wpdb->prepare("AND pv.post_type = %s", $selected_post_types[0]);
+        $post_type_condition = $wpdb->prepare("AND p.post_type = %s", $selected_post_types[0]);
     } else {
         // Multiple post types condition
         $placeholders = implode(', ', array_fill(0, count($selected_post_types), '%s'));
         // phpcs:ignore
-        $post_type_condition = $wpdb->prepare("AND pv.post_type IN ($placeholders)", ...$selected_post_types);
+        $post_type_condition = $wpdb->prepare("AND p.post_type IN ($placeholders)", ...$selected_post_types);
     }
     // phpcs:ignore
     $total_views_count = $wpdb->get_var($wpdb->prepare("SELECT SUM(pv.view_count) FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_status = 'publish' $post_type_condition AND DATE(pv.view_date) BETWEEN %s AND %s", $first_day_last_month, $last_day_last_month));
@@ -574,15 +577,16 @@ function get_todays_views_count($attr)
     $today_date = date('Y-m-d');
     // Get the total views count for today
     $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = ['post'];
     //$placeholders = prepare_placeholders($selected_post_types);
     if (count($selected_post_types) === 1) {
         // Single post type condition
-        $post_type_condition = $wpdb->prepare("AND pv.post_type = %s", $selected_post_types[0]);
+        $post_type_condition = $wpdb->prepare("AND p.post_type = %s", $selected_post_types[0]);
     } else {
         // Multiple post types condition
         $placeholders = implode(', ', array_fill(0, count($selected_post_types), '%s'));
         // phpcs:ignore
-        $post_type_condition = $wpdb->prepare("AND pv.post_type IN ($placeholders)", ...$selected_post_types);
+        $post_type_condition = $wpdb->prepare("AND p.post_type IN ($placeholders)", ...$selected_post_types);
     }
     // phpcs:ignore
     $todays_views_count = $wpdb->get_var($wpdb->prepare("SELECT SUM(pv.view_count) FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_status = 'publish' $post_type_condition AND DATE(pv.view_date) = %s", $today_date));
