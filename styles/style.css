@@ -1,0 +1,245 @@
+:root {
+    --et_pb_post_title_color: #000000; /* Default */
+    --et_pb_post_title_color_hover: #ff0000; /* Hover */
+    --et_pb_post_title_color_tablet: #333333; /* Tablet */
+    --et_pb_post_title_color_phone: #666666; /* Mobile */
+}
+.tooltip-container-total {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-total {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip-container-total:hover .tooltip-total {
+    visibility: visible;
+    opacity: 1;
+}
+
+div.chart-container-layout1 {
+    position: relative;
+}
+.tp-chart-container-front {
+    border-radius: 4px;
+    display: flex;
+    flex: 1 1;
+    width: 100%;
+    padding:20px;
+    gap: 20px;
+    align-items: center;
+}
+.tp-chart-container-front.layout2 {
+    flex-direction: column;
+}
+.tp-chart-container-front.layout1.column1 {
+    flex-direction: column;
+}
+.tooltip {
+    color: #000;
+    position: absolute;
+    visibility: hidden; /* Initially hidden */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    pointer-events: none; /* Ensure tooltip doesn't interfere with mouse events */
+    z-index: 9999; /* Make sure the tooltip appears on top of other elements */
+  }
+  
+  
+
+article.tp-divi-popular-post.layout1 ,.tp-chart-container-front article.tp-divi-popular-post{
+    margin-bottom: 20px;
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    align-items: center;
+}
+
+.tp-post-cats ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: auto;
+    display: inline-block;
+}
+.tp-post-cats ul li {
+    display: inline-block;
+    padding-right: 5px;
+}
+.tp-divi-popular-post {
+    border-style: solid;
+    border-width: 0px;
+}
+.tp-divi-popular-post .tp-post-title a {
+    font-size:22px;
+    color:#333;
+}
+.tp-divi-popular-post .tp-post-title h2 {
+    padding: 0;
+    margin: 0;
+}
+.tp-divi-popular-post .tp-meta-data {
+    font-size:14px;
+    color:#333;
+}
+.tp-divi-popular-post .tp-post-content {
+    font-size:14px;
+    color:#333;
+}
+.tp-read-more a {
+    display: inline-block;
+    border-style: solid;
+}
+article.tp-divi-popular-post .tp-post-thumb img {
+    width:100%;
+    /* height: 200px; */
+    display: block;
+    object-fit: cover;
+}
+article.tp-divi-popular-post.layout1 .tp-left-wrapper,
+.tp-chart-container-front .tp-divi-popular-post .tp-left-wrapper {
+    max-width: 20%;
+    position: relative;
+    overflow: hidden;
+}
+article.tp-divi-popular-post.layout1 .tp-right-wrapper,
+.tp-chart-container-front .tp-divi-popular-post .tp-right-wrapper {
+    width: 80%;
+}
+.layout1 .tp-left-wrapper .tp-post-thumb {
+    /* display: block; */
+    height: 100%;
+}
+.et-pb-loader {
+    display: block;
+    margin: 20px auto;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #3498db; /* Change to your desired color */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+
+
+  /* LAYOUT 2 */
+  article.tp-divi-popular-post.layout2 {
+    margin-bottom: 20px;
+}
+.tp_popular_posts .tp-layout-container {
+    display: flex;
+    flex-wrap: wrap; 
+}
+.tp-layout-container article {
+    width: calc((100% - 32px) / 3);
+    box-sizing: border-box;
+}
+
+.tp-layout-container.column1 article {
+    width:100%;
+}
+.tp_popular_posts .tp-layout-container.column2 {
+    gap: 16px;
+}
+.tp-layout-container.column2 article {
+    width: calc((100% - 16px) / 2);
+}
+.tp_popular_posts .tp-layout-container.column3 {
+    gap: 16px;
+}
+.tp-layout-container.column3 article {
+    width: calc((100% - 32px) / 3);
+}
+.tp_popular_posts .tp-layout-container.column4 {
+    gap: 15px;
+}
+.tp-layout-container.column4 article {
+    width: calc((100% - 45px) / 4);
+}
+article.tp-divi-popular-post.layout2 .tp-post-thumb img {
+    height: 250px;
+}
+@media only screen and (max-width:980px) {
+    .tp-layout-container.tablet-column1 article {
+        width:100%;
+    }
+    .tp_popular_posts .tp-layout-container.tablet-column2 {
+        gap: 16px;
+    }
+    .tp-layout-container.tablet-column2 article {
+        width: calc((100% - 16px) / 2);
+    }
+    .tp_popular_posts .tp-layout-container.tablet-column3 {
+        gap: 16px;
+    }
+    .tp-layout-container.tablet-column3 article {
+        width: calc((100% - 32px) / 3);
+    }
+    .tp_popular_posts .tp-layout-container.tablet-column4 {
+        gap: 15px;
+    }
+    .tp-layout-container.tablet-column4 article {
+        width: calc((100% - 45px) / 4);
+    }
+}
+@media only screen and (max-width:767px) {
+    .tp-layout-container.phone-column1 article {
+        width:100%;
+    }
+    .tp_popular_posts .tp-layout-container.phone-column2 {
+        gap: 16px;
+    }
+    .tp-layout-container.phone-column2 article {
+        width: calc((100% - 16px) / 2);
+    }
+    .tp_popular_posts .tp-layout-container.phone-column3 {
+        gap: 16px;
+    }
+    .tp-layout-container.phone-column3 article {
+        width: calc((100% - 32px) / 3);
+    }
+    .tp_popular_posts .tp-layout-container.phone-column4 {
+        gap: 15px;
+    }
+    .tp-layout-container.phone-column4 article {
+        width: calc((100% - 45px) / 4);
+    }
+}
+
+@media only screen and (max-width:768px) {
+    .tp-chart-container-front {
+       flex-direction: column;
+    }
+}
+
+@media only screen and (max-width:500px) {
+    .tp-chart-container-front {
+        flex-direction: column;
+     }
+}
