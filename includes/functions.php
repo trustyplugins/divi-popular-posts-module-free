@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class POPULAR_DIVI_MODULE_FUNCTIONS
 {
     public function __construct()
@@ -23,8 +24,8 @@ class POPULAR_DIVI_MODULE_FUNCTIONS
         if (is_singular()) {
             global $post, $wpdb;
 
-            $saved_post_types = get_option('tp_divi_post_types', []);
-            $view_tracking_method = get_option('tp_divi_logic_setting', 'default'); // Default: Every Single Visit
+            $saved_post_types = get_option('tpdivi_post_types', []);
+            $view_tracking_method = get_option('tpdivi_logic_setting', 'default'); // Default: Every Single Visit
             $post_id = $post->ID;
             // phpcs:ignore
             $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '';
@@ -53,8 +54,8 @@ class POPULAR_DIVI_MODULE_FUNCTIONS
                     ]);
                 } else {
                     // Cache Mechanism
-                    $unique_visitor_key = 'post_views_' . $post_id . '_' . md5($ip . $user_agent);
-                    $cookie_key = 'tp_divi_viewed_' . $post_id;
+                    $unique_visitor_key = 'tpdivi_post_views_' . $post_id . '_' . md5($ip . $user_agent);
+                    $cookie_key = 'tpdivi_viewed_' . $post_id;
 
                     // Check if this user has already been tracked
                     $already_viewed = get_transient($unique_visitor_key) || isset($_COOKIE[$cookie_key]);
@@ -92,8 +93,10 @@ new POPULAR_DIVI_MODULE_FUNCTIONS();
 add_action('rest_api_init', function () {
     register_rest_route('tp/v1', '/render/', [
         'methods'  => 'POST',
-        'callback' => 'tp_render_popular_posts',
-        'permission_callback' => '__return_true', // Allowing all users for now
+        'callback' => 'tpdivi_render_popular_posts',
+        'permission_callback' => function () {
+            return current_user_can('manage_options');
+        },
         'args'     => [
             'attributes' => [
                 'required' => true,
@@ -108,8 +111,10 @@ add_action('rest_api_init', function () {
 add_action('rest_api_init', function () {
     register_rest_route('tp/v1', '/render-charts/', [
         'methods'  => 'POST',
-        'callback' => 'tp_render_popular_posts_charts',
-        'permission_callback' => '__return_true', // Allowing all users for now
+        'callback' => 'tpdivi_render_popular_posts_charts',
+        'permission_callback' => function () {
+            return current_user_can('manage_options');
+        },
         'args'     => [
             'attributes' => [
                 'required' => true,
@@ -121,7 +126,7 @@ add_action('rest_api_init', function () {
     ]);
 });
 
-function tp_render_popular_posts_charts($request)
+function tpdivi_render_popular_posts_charts($request)
 {
     // Get attributes and check if they are provided
     $attributes = $request->get_param('attributes');
@@ -131,56 +136,39 @@ function tp_render_popular_posts_charts($request)
     }
 
     $data = [];
-    $selected_post_types = get_option('tp_divi_post_types', []);
-    if (!empty($attributes['type_settings'])) {
-        $selected_post_types = explode(',', sanitize_text_field($attributes['type_settings']));
-    }
-
-    // Ensure valid post types are selected
-    if (empty($selected_post_types)) {
-        return wp_send_json($data); // No post types selected, return empty response
-    }
-
     // Default filter and posts number
     $selected_filter = $attributes['filter'] ?? 'all';
     $posts_number = isset($attributes['posts_number']) ? absint($attributes['posts_number']) : 5;
     $chart_posts = isset($attributes['chart_posts']) ? absint($attributes['chart_posts']) : 5;
     $posts_number=max($posts_number,$chart_posts);
     global $wpdb;
-    // Prepare SQL placeholders for post types
-    $placeholders = implode(',', array_fill(0, count($selected_post_types), '%s'));
-
-    // Date range for filtering
-    //phpcs:ignore
-    $today = date('Y-m-d');
-    //phpcs:ignore
-    $week_start = date('Y-m-d', strtotime('-7 days'));
-    //phpcs:ignore
-    $month_start = date('Y-m-d', strtotime('-30 days'));
-    //phpcs:ignore
-    $year_start = date('Y-m-d', strtotime('-1 year'));
-
-    // Build the WHERE clause based on selected filter
-    $date_filter = '';
+    $date_value = '';
     switch ($selected_filter) {
         case 'today':
-            $date_filter = "AND DATE(pv.view_date) >= '$today'";
+            $date_value = date('Y-m-d');
             break;
         case 'weekly':
-            $date_filter = "AND DATE(pv.view_date) >= '$week_start'";
+            $date_value = date('Y-m-d', strtotime('-7 days'));
             break;
         case 'monthly':
-            $date_filter = "AND DATE(pv.view_date) >= '$month_start'";
+            $date_value = date('Y-m-d', strtotime('-30 days'));
             break;
         case 'yearly':
-            $date_filter = "AND DATE(pv.view_date) >= '$year_start'";
+            $date_value = date('Y-m-d', strtotime('-1 year'));
             break;
     }
-
-    $args = [$posts_number];
-    // phpcs:ignore
-    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
-
+    $args = [];
+    $date_sql = '';
+    if ($date_value) {
+        $date_sql = 'AND DATE(pv.view_date) >= %s';
+        $args[] = $date_value;
+    }
+    $args[] = (int) $posts_number;
+    // SQL query
+    $sql = "SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type ='post' AND p.post_status = 'publish' $date_sql GROUP BY p.ID ORDER BY total_views DESC LIMIT %d";
+    // Get results
+    //phpcs:ignore
+    $popular_posts = $wpdb->get_results($wpdb->prepare($sql, ...$args));
     $total_views_sum = array_sum(array_column($popular_posts, 'total_views'));
     // Define default excerpt length
     $excerpt_length = isset($attributes['excerpt_length']) ? absint($attributes['excerpt_length']) : 20;
@@ -230,65 +218,45 @@ function tp_render_popular_posts_charts($request)
 }
 
 
-function tp_render_popular_posts($request)
+function tpdivi_render_popular_posts($request)
 {
     // Get attributes and check if they are provided
     $attributes = $request->get_param('attributes');
     if (empty($attributes)) {
         return wp_send_json([]);
     }
-
     $data = [];
-    $selected_post_types = get_option('tp_divi_post_types', []);
-    if (!empty($attributes['type_settings'])) {
-        $selected_post_types = explode(',', sanitize_text_field($attributes['type_settings']));
-    }
-
-    // Ensure valid post types are selected
-    if (empty($selected_post_types)) {
-        return wp_send_json($data); // No post types selected, return empty response
-    }
-    $selected_post_types = ['post'];
     // Default filter and posts number
     $selected_filter = $attributes['filter'] ?? 'all';
     $posts_number = isset($attributes['posts_number']) ? absint($attributes['posts_number']) : 5;
-
     global $wpdb;
-    // Prepare SQL placeholders for post types
-    $placeholders = implode(',', array_fill(0, count($selected_post_types), '%s'));
-
-    // Date range for filtering
-    //phpcs:ignore
-    $today = date('Y-m-d');
-    //phpcs:ignore
-    $week_start = date('Y-m-d', strtotime('-7 days'));
-    //phpcs:ignore
-    $month_start = date('Y-m-d', strtotime('-30 days'));
-    //phpcs:ignore
-    $year_start = date('Y-m-d', strtotime('-1 year'));
-
-    // Build the WHERE clause based on selected filter
-    $date_filter = '';
+    $date_value = '';
     switch ($selected_filter) {
         case 'today':
-            $date_filter = "AND DATE(pv.view_date) >= '$today'";
+            $date_value = date('Y-m-d');
             break;
         case 'weekly':
-            $date_filter = "AND DATE(pv.view_date) >= '$week_start'";
+            $date_value = date('Y-m-d', strtotime('-7 days'));
             break;
         case 'monthly':
-            $date_filter = "AND DATE(pv.view_date) >= '$month_start'";
+            $date_value = date('Y-m-d', strtotime('-30 days'));
             break;
         case 'yearly':
-            $date_filter = "AND DATE(pv.view_date) >= '$year_start'";
+            $date_value = date('Y-m-d', strtotime('-1 year'));
             break;
     }
-
-    // SQL query to get popular posts
-    $args = [$posts_number];
-
-    // phpcs:ignore
-    $popular_posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type='post' AND p.post_status = 'publish' $date_filter GROUP BY p.ID ORDER BY total_views DESC LIMIT %d", ...$args));
+    $args = [];
+    $date_sql = '';
+    if ($date_value) {
+        $date_sql = 'AND DATE(pv.view_date) >= %s';
+        $args[] = $date_value;
+    }
+    $args[] = (int) $posts_number;
+    // SQL query
+    $sql = "SELECT p.ID AS post_id,p.post_title,p.post_type,SUM(pv.view_count) AS total_views FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_type ='post' AND p.post_status = 'publish' $date_sql GROUP BY p.ID ORDER BY total_views DESC LIMIT %d";
+    // Get results
+    //phpcs:ignore
+    $popular_posts = $wpdb->get_results($wpdb->prepare($sql, ...$args));
 
     // Define default excerpt length
     $excerpt_length = isset($attributes['excerpt_length']) ? absint($attributes['excerpt_length']) : 20;
@@ -305,7 +273,7 @@ function tp_render_popular_posts($request)
         $post_data = get_post($postloop->post_id);
         $post_content = et_strip_shortcodes(et_delete_post_first_video($post_data->post_content), true);
         $shortcodes_to_remove = ['tp_popular_posts'];
-        $processed_content = remove_specific_shortcodes($post_content, $shortcodes_to_remove);
+        $processed_content = tpdivi_remove_specific_shortcodes($post_content, $shortcodes_to_remove);
         ET_Builder_Element::clean_internal_modules_styles();
         $excerpt = et_core_intentionally_unescaped(wpautop(et_delete_post_first_video(strip_shortcodes(truncate_post($excerpt_length, false, $post_data, true)))), 'html');
         $content = et_core_intentionally_unescaped(apply_filters('the_content', $processed_content), 'html');
@@ -348,9 +316,9 @@ function tp_render_popular_posts($request)
 add_action('rest_api_init', function () {
     register_rest_route('tp/v1', 'chart/post-views', [
         'methods' => 'POST',
-        'callback' => 'get_post_views',
+        'callback' => 'tpdivi_get_post_views',
         'permission_callback' => function () {
-            return true;
+            return current_user_can('manage_options');
         },
         'args'     => [
             'attributes' => [
@@ -365,7 +333,7 @@ add_action('rest_api_init', function () {
 
 
 // Helper function to sanitize and get dates
-function get_date_range($attr)
+function tpdivi_get_date_range($attr)
 {
     //phpcs:ignore
     $start_date = date('Y-m-d', strtotime('-1 year'));
@@ -384,9 +352,9 @@ function get_date_range($attr)
 }
 
 // Helper function to get selected post types
-function get_selected_post_types($attr)
+function tpdivi_get_selected_post_types($attr)
 {
-    $selected_post_types = get_option('tp_divi_post_types', ['post']);
+    $selected_post_types = get_option('tpdivi_post_types', ['post']);
 
     if (isset($attr['postType']) && !empty($attr['postType']) && $attr['postType'] != '0') {
         $selected_post_types = explode(',', sanitize_text_field($attr['postType']));
@@ -396,21 +364,21 @@ function get_selected_post_types($attr)
 }
 
 // Helper function to prepare placeholders for SQL
-function prepare_placeholders($selected_post_types)
+function tpdivi_prepare_placeholders($selected_post_types)
 {
     return implode(',', array_fill(0, count($selected_post_types), '%s'));
 }
 
 
 // Get SQL results (optimized)
-function get_sql_results($attr, $posts_number = 20, $filter = 'no-filter')
+function tpdivi_get_sql_results($attr, $posts_number = 20, $filter = 'no-filter')
 {
     global $wpdb;
 
     // Prepare values
-    $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = tpdivi_get_selected_post_types($attr);
     $selected_post_types = ['post'];
-    list($start_date, $end_date)  = get_date_range($attr);
+    list($start_date, $end_date)  = tpdivi_get_date_range($attr);
 
     // Prepare the placeholders for the post types
     $placeholders = implode(',', array_fill(0, count($selected_post_types), '%s'));
@@ -455,14 +423,14 @@ function get_sql_results($attr, $posts_number = 20, $filter = 'no-filter')
 
 
 // Get views by date (optimized)
-function get_views_by_date($attr)
+function tpdivi_get_views_by_date($attr)
 {
     global $wpdb;
 
     // Prepare values
-    $selected_post_types = get_selected_post_types($attr); // Get post types
+    $selected_post_types = tpdivi_get_selected_post_types($attr); // Get post types
     $selected_post_types = ['post'];
-    list($start_date, $end_date)  = get_date_range($attr);       // Get date range
+    list($start_date, $end_date)  = tpdivi_get_date_range($attr);       // Get date range
 
     // Prepare placeholders for selected post types
     $placeholders = implode(',', array_fill(0, count($selected_post_types), '%s'));
@@ -476,7 +444,7 @@ function get_views_by_date($attr)
 
 
 // Get total views count (optimized)
-function get_total_views_count($attr)
+function tpdivi_get_total_views_count($attr)
 {
     global $wpdb;
     // SQL query to count total views
@@ -488,14 +456,14 @@ function get_total_views_count($attr)
     WHERE p.post_status = 'publish'");
 }
 // Get filtered views count (optimized)
-function get_filtered_views_count($attr)
+function tpdivi_get_filtered_views_count($attr)
 {
     global $wpdb;
     // Prepare values
-    $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = tpdivi_get_selected_post_types($attr);
     $selected_post_types = ['post'];
-    list($start_date, $end_date)  = get_date_range($attr);
-    $placeholders = prepare_placeholders($selected_post_types);
+    list($start_date, $end_date)  = tpdivi_get_date_range($attr);
+    $placeholders = tpdivi_prepare_placeholders($selected_post_types);
     // Build SQL query for filtered views
     $sql = "
         SELECT SUM(pv.view_count)
@@ -514,7 +482,7 @@ function get_filtered_views_count($attr)
 }
 
 // Get total posts count (optimized)
-function get_total_posts_count($attr)
+function tpdivi_get_total_posts_count($attr)
 {
     global $wpdb;
     // SQL query to count total posts
@@ -527,14 +495,14 @@ function get_total_posts_count($attr)
 ");
 }
 
-function get_filtered_posts_count($attr)
+function tpdivi_get_filtered_posts_count($attr)
 {
     global $wpdb;
     // Get the selected post types (can be passed as a comma-separated string in $attr)
-    $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = tpdivi_get_selected_post_types($attr);
     $selected_post_types = ['post'];
-    list($start_date, $end_date)  = get_date_range($attr);
-    $placeholders = prepare_placeholders($selected_post_types);
+    list($start_date, $end_date)  = tpdivi_get_date_range($attr);
+    $placeholders = tpdivi_prepare_placeholders($selected_post_types);
     // Prepare arguments for the query
     $args = array_merge($selected_post_types, [$start_date, $end_date]);
     // Execute the query and return the count
@@ -544,7 +512,7 @@ function get_filtered_posts_count($attr)
     return (int)$total_posts_count;
 }
 
-function get_last_month_views_count($attr)
+function tpdivi_get_last_month_views_count($attr)
 {
     global $wpdb;
     // Get the first and last day of the previous month
@@ -553,9 +521,9 @@ function get_last_month_views_count($attr)
     //phpcs:ignore
     $last_day_last_month = date('Y-m-t', strtotime('last day of last month'));
     // phpcs:ignore
-    $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = tpdivi_get_selected_post_types($attr);
     $selected_post_types = ['post'];
-    //$placeholders = prepare_placeholders($selected_post_types);
+    //$placeholders = tdivi_prepare_placeholders($selected_post_types);
     if (count($selected_post_types) === 1) {
         // Single post type condition
         $post_type_condition = $wpdb->prepare("AND p.post_type = %s", $selected_post_types[0]);
@@ -569,16 +537,16 @@ function get_last_month_views_count($attr)
     $total_views_count = $wpdb->get_var($wpdb->prepare("SELECT SUM(pv.view_count) FROM {$wpdb->prefix}post_views_tp pv INNER JOIN {$wpdb->prefix}posts p ON pv.post_id = p.ID WHERE p.post_status = 'publish' $post_type_condition AND DATE(pv.view_date) BETWEEN %s AND %s", $first_day_last_month, $last_day_last_month));
     return (int)$total_views_count;
 }
-function get_todays_views_count($attr)
+function tpdivi_get_todays_views_count($attr)
 {
     global $wpdb;
     // Get today's date
     //phpcs:ignore
     $today_date = date('Y-m-d');
     // Get the total views count for today
-    $selected_post_types = get_selected_post_types($attr);
+    $selected_post_types = tpdivi_get_selected_post_types($attr);
     $selected_post_types = ['post'];
-    //$placeholders = prepare_placeholders($selected_post_types);
+    //$placeholders = tpdivi_prepare_placeholders($selected_post_types);
     if (count($selected_post_types) === 1) {
         // Single post type condition
         $post_type_condition = $wpdb->prepare("AND p.post_type = %s", $selected_post_types[0]);
@@ -594,7 +562,7 @@ function get_todays_views_count($attr)
 }
 
 // Helper function to prepare post data for the response
-function prepare_post_data($posts)
+function tpdivi_prepare_post_data($posts)
 {
     $post_data = [];
 
@@ -618,21 +586,21 @@ function prepare_post_data($posts)
     return $post_data;
 }
 // Main function to get post views (optimized)
-function get_post_views($request)
+function tpdivi_get_post_views($request)
 {
     $attr = $request->get_param('attributes');
 
     // Fetch results
-    $posts = get_sql_results($attr, 15, 'filter');
-    $viewsbydate = get_views_by_date($attr);
-    $trending = get_sql_results($attr, 5, 'no-filter');
-    $total_views = get_total_views_count($attr);
-    $total_posts = get_total_posts_count($attr);
-    $filtered_views = get_filtered_views_count($attr);
-    $filtered_posts = get_filtered_posts_count($attr);
+    $posts = tpdivi_get_sql_results($attr, 15, 'filter');
+    $viewsbydate = tpdivi_get_views_by_date($attr);
+    $trending = tpdivi_get_sql_results($attr, 5, 'no-filter');
+    $total_views = tpdivi_get_total_views_count($attr);
+    $total_posts = tpdivi_get_total_posts_count($attr);
+    $filtered_views = tpdivi_get_filtered_views_count($attr);
+    $filtered_posts = tpdivi_get_filtered_posts_count($attr);
     // Prepare data arrays
-    $postdata = prepare_post_data($posts);
-    $top_posts_data = prepare_post_data(array_slice($posts, 0, 5));
+    $postdata = tpdivi_prepare_post_data($posts);
+    $top_posts_data = tpdivi_prepare_post_data(array_slice($posts, 0, 5));
     // Prepare final response data
     $data = [
         'postdata' => $postdata,
@@ -641,15 +609,15 @@ function get_post_views($request)
         'filtered_views' => $filtered_views,
         'total_posts' => $total_posts,
         'filtered_posts' => $filtered_posts,
-        'last_month_views' => get_last_month_views_count($attr),
-        'today_views' => get_todays_views_count($attr),
-        'available_post_types' => get_option('tp_divi_post_types', []),
+        'last_month_views' => tpdivi_get_last_month_views_count($attr),
+        'today_views' => tpdivi_get_todays_views_count($attr),
+        'available_post_types' => get_option('tpdivi_post_types', []),
         'views_by_date' => $viewsbydate,
     ];
 
     return new WP_REST_Response($data, 200);
 }
-function remove_specific_shortcodes($content, $shortcodes_to_remove = [])
+function tpdivi_remove_specific_shortcodes($content, $shortcodes_to_remove = [])
 {
     foreach ($shortcodes_to_remove as $shortcode) {
         // Regex to match the shortcode, including attributes and closing tag

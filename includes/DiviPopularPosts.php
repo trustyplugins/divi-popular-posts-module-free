@@ -1,6 +1,6 @@
 <?php
-
-class DIPP_DiviPopularPosts extends DiviExtension {
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+class TPDIVI_DiviPopularPosts extends DiviExtension {
 
 	/**
 	 * The gettext domain for the extension's translations.
@@ -30,7 +30,7 @@ class DIPP_DiviPopularPosts extends DiviExtension {
 	public $version = '1.0.0';
 
 	/**
-	 * DIPP_DiviPopularPosts constructor.
+	 * TPDIVI_DiviPopularPosts constructor.
 	 *
 	 * @param string $name
 	 * @param array  $args
@@ -43,4 +43,4 @@ class DIPP_DiviPopularPosts extends DiviExtension {
 	}
 }
 
-new DIPP_DiviPopularPosts;
+new TPDIVI_DiviPopularPosts;

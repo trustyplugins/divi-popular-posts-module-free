@@ -1,4 +1,4 @@
-/* global tp_analytics */
+/* global tpdivi_analytics */
 import React, { Component, createRef } from "react";
 import * as d3 from "d3";
 import './style.css';
@@ -126,13 +126,14 @@ class TpPopularPostCharts extends Component {
   }
 
   fetchRenderedHTML = () => {
-    //console.log(tp_analytics);
+    //console.log(tpdivi_analytics);
 
-    const endpoint = `${tp_analytics.site_url}/wp-json/tp/v1/render-charts/`;
+    const endpoint = `${tpdivi_analytics.site_url}/wp-json/tp/v1/render-charts/`;
     fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // Send attributes as JSON
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': tpdivi_analytics.nonce,
       },
       body: JSON.stringify({
         attributes: this.props,

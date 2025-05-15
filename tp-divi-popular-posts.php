@@ -1,14 +1,13 @@
 <?php
 /*
-Plugin Name: Popular Posts for Divi - Free
+Plugin Name: Popular Posts for Divi - Lite
 Plugin URI:  https://trustyplugins.com
 Description: A popular posts module for Divi with analytics dashboard and charts.
 Version:     1.0
 Author:      Trusty Plugins
-Author URI:  https://trustyplugins.net
 License:     GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: tp-divi-popular-posts
+Text Domain: popular-posts-for-divi-with-charts
 Domain Path: /languages
 
 Divi Popular Posts For Divi is free software: you can redistribute it and/or modify
@@ -17,7 +16,7 @@ the Free Software Foundation, either version 2 of the License, or
 any later version.
 
 You should have received a copy of the GNU General Public License
-along with Popular Posts for Divi - Free. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
+along with Popular Posts for Divi - Lite. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
  */
 if (! defined('ABSPATH')) exit; // Exit if accessed directly 
 
@@ -99,7 +98,7 @@ class POPULAR_DIVI_MODULE_ACTION
     {
         $message = esc_html__(
             'Popular Posts Module For Divi requires Divi Theme to be installed and activated.',
-            'tp-divi-popular-posts'
+            'popular-posts-for-divi-with-charts'
         );
         printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', esc_html($message));
         

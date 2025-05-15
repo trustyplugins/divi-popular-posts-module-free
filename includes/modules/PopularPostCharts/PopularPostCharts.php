@@ -1,6 +1,6 @@
 <?php
-
-class TP_Popular_Post_Charts extends ET_Builder_Module
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+class TPDIVI_Popular_Post_Charts extends ET_Builder_Module
 {
 
 	public $slug       = 'tp_popular_post_charts';
@@ -14,22 +14,22 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 
 	public function init()
 	{
-		$this->name = esc_html__('Popular posts - Charts', 'tp-divi-popular-posts');
+		$this->name = esc_html__('Popular posts - Charts', 'popular-posts-for-divi-with-charts');
 		$this->main_css_element = '%%order_class%%';
 		$this->settings_modal_toggles = array(
 			'general' => array(
 				'toggles' => array(
 					'post_setting' => array(
-						'title'          => esc_html__('Settings', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Settings', 'popular-posts-for-divi-with-charts'),
 						'default_active' => true, // Open by default
 						'priority'       => 1,    // Highest priority (appears first)
 					),
 					'logic_setting' => array(
-						'title'          => esc_html__('Filter', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Filter', 'popular-posts-for-divi-with-charts'),
 						'priority'       => 2,    // Highest priority (appears first)
 					),
 					'charts_setting' => array(
-						'title'          => esc_html__('Charts', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Charts', 'popular-posts-for-divi-with-charts'),
 						'priority'       => 3,    // Highest priority (appears first)
 					),
 				),
@@ -37,10 +37,10 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			'advanced' => array(  // Correct key is 'advanced' not 'general' again
 				'toggles' => array(
 					'post_container' => array(
-						'title'          => esc_html__('Post Container', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Post Container', 'popular-posts-for-divi-with-charts'),
 					),
 					'post_title' => array(
-						'title'          => esc_html__('Post Title', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Post Title', 'popular-posts-for-divi-with-charts'),
 						'tabbed_subtoggles' => true,
 						'sub_toggles' => array(
 							'a'     => array(
@@ -50,10 +50,10 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 						),
 					),
 					'post_image' => array(
-						'title'          => esc_html__('Post Image', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Post Image', 'popular-posts-for-divi-with-charts'),
 					),
 					'post_body'   => array(
-						'title' => esc_html__('Post Body', 'tp-divi-popular-posts'),
+						'title' => esc_html__('Post Body', 'popular-posts-for-divi-with-charts'),
 						'tabbed_subtoggles' => true,
 						'sub_toggles' => array(
 							'p'     => array(
@@ -71,7 +71,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 						),
 					),
 					'post_meta'   => array(
-						'title' => esc_html__('Post Meta', 'tp-divi-popular-posts'),
+						'title' => esc_html__('Post Meta', 'popular-posts-for-divi-with-charts'),
 						'tabbed_subtoggles' => true,
 						'sub_toggles' => array(
 							'p'     => array(
@@ -85,7 +85,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 						),
 					),
 					'post_button' => array(
-						'title'          => esc_html__('Post Button', 'tp-divi-popular-posts'),
+						'title'          => esc_html__('Post Button', 'popular-posts-for-divi-with-charts'),
 						'show_if'         => array(
 							'show_more' => 'on',
 						),
@@ -97,30 +97,30 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 
 	public function get_fields()
 	{
-		$saved_post_types = get_option('tp_divi_post_types', []);
+		$saved_post_types = get_option('tpdivi_post_types', []);
 		$saved_post_types_with_keys = array_combine($saved_post_types, array_map('ucfirst', $saved_post_types));
 		$saved_post_types_with_keys=array('post'=>'post');
 		return array(
 			'filter'                  => array(
-				'label'            => esc_html__('Filter', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Filter', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'select',
 				'option_category'  => 'configuration',
 				'options'          => array(
-					'yearly'  => esc_html__('Yearly', 'tp-divi-popular-posts'),
+					'yearly'  => esc_html__('Yearly', 'popular-posts-for-divi-with-charts'),
 				),
 
-				'description'      => esc_html__('Showing the full content will not truncate your posts on the index page. Showing the excerpt will only display your excerpt text.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Showing the full content will not truncate your posts on the index page. Showing the excerpt will only display your excerpt text.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'logic_setting',
 				'default' => 'yearly',
 			),
 			'charts_type'                  => array(
-				'label'            => esc_html__('Charts', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Charts', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'select',
 				'option_category'  => 'configuration',
 				'options'          => array(
-					'layout1' => esc_html__("Layout 1", 'tp-divi-popular-posts'),
+					'layout1' => esc_html__("Layout 1", 'popular-posts-for-divi-with-charts'),
 				),
-				'description'      => esc_html__('Select the style of graphic charts.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Select the style of graphic charts.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'charts_setting',
 				'default' => 'layout1',
 				'computed_affects' => array(
@@ -128,14 +128,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'charts_column'                  => array(
-				'label'            => esc_html__('Charts', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Charts', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'select',
 				'option_category'  => 'configuration',
 				'options'          => array(
-					'column1' => esc_html__("Column 1", 'tp-divi-popular-posts'),
-					'column2'  => esc_html__('Column 2', 'tp-divi-popular-posts'),
+					'column1' => esc_html__("Column 1", 'popular-posts-for-divi-with-charts'),
+					'column2'  => esc_html__('Column 2', 'popular-posts-for-divi-with-charts'),
 				),
-				'description'      => esc_html__('Select the style of graphic charts.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Select the style of graphic charts.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'charts_setting',
 				'default' => 'column1',
 				'computed_affects' => array(
@@ -146,7 +146,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'chart_width' => array(
-				'label'           => esc_html__('Chart Width', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Chart Width', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'range',
 				'tab_slug'        => 'general',
 				'toggle_slug'     => 'charts_setting',
@@ -165,11 +165,11 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			),
 
 			'type_settings' => array(
-				'label'           => esc_html__('Post Types', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Post Types', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'dbc_multiple_checkboxes_with_ids_tp',
 				'option_category' => 'configuration',
 				'options'         => $saved_post_types_with_keys,
-				'description'     => esc_html__('Select the post types to include.', 'tp-divi-popular-posts'),
+				'description'     => esc_html__('Select the post types to include.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'     => 'post_setting',
 				'tab_slug'        => 'general',
 				'computed_affects' => array(
@@ -178,10 +178,10 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				//'default'         => array( 'post' ), // Default checked values
 			),
 			'chart_posts'                  => array(
-				'label'            => esc_html__('Post Count for chart', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Post Count for chart', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'text',
 				'option_category'  => 'configuration',
-				'description'      => esc_html__('Choose how much posts you would like to display per page.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Choose how much posts you would like to display per page.', 'popular-posts-for-divi-with-charts'),
 				'computed_affects' => array(
 					'__posts',
 				),
@@ -189,14 +189,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				'default'          => 10,
 			),
 			'show_posts'                => array(
-				'label'            => esc_html__('Display Posts with Chart', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Display Posts with Chart', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('This will display posts with the chart too.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('This will display posts with the chart too.', 'popular-posts-for-divi-with-charts'),
 				'computed_affects' => array(
 					'__posts',
 				),
@@ -206,10 +206,10 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				// 'hover'            => 'tabs',
 			),
 			'posts_number'                  => array(
-				'label'            => esc_html__('Post Count', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Post Count', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'text',
 				'option_category'  => 'configuration',
-				'description'      => esc_html__('Choose how much posts you would like to display per page.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Choose how much posts you would like to display per page.', 'popular-posts-for-divi-with-charts'),
 				'computed_affects' => array(
 					'__posts',
 				),
@@ -220,14 +220,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_thumbnail'                => array(
-				'label'            => esc_html__('Show Featured Image', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Featured Image', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('This will turn thumbnails on and off.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('This will turn thumbnails on and off.', 'popular-posts-for-divi-with-charts'),
 				'computed_affects' => array(
 					'__posts',
 				),
@@ -240,8 +240,8 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_excerpt'                  => array(
-				'label'            => esc_html__('Show Content', 'tp-divi-popular-posts'),
-				'description'      => esc_html__('Turn post content on and off.', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Content', 'popular-posts-for-divi-with-charts'),
+				'description'      => esc_html__('Turn post content on and off.', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
@@ -255,8 +255,8 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'excerpt_length'                => array(
-				'label'            => esc_html__('Excerpt Length', 'tp-divi-popular-posts'),
-				'description'      => esc_html__('Define the length of automatically generated excerpts. Leave blank for default ( 50 ) words. ', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Excerpt Length', 'popular-posts-for-divi-with-charts'),
+				'description'      => esc_html__('Define the length of automatically generated excerpts. Leave blank for default ( 50 ) words. ', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'text',
 				'default'          => '50',
 				'computed_affects' => array(
@@ -270,7 +270,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_more'                     => array(
-				'label'            => esc_html__('Show Read More Button', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Read More Button', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
@@ -278,7 +278,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 					'on'  => et_builder_i18n('Yes'),
 				),
 				'depends_show_if'  => 'off',
-				'description'      => esc_html__('Here you can define whether to show "read more" link after the excerpts or not.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Here you can define whether to show "read more" link after the excerpts or not.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'off',
 				'show_if'         => array(
@@ -286,14 +286,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_author'                   => array(
-				'label'            => esc_html__('Show Author', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Author', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('Turn on or off the author link.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Turn on or off the author link.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'on',
 				'show_if'         => array(
@@ -301,14 +301,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_date'                     => array(
-				'label'            => esc_html__('Show Date', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Date', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('Turn the date on or off.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Turn the date on or off.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'on',
 				'show_if'         => array(
@@ -316,10 +316,10 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'meta_date'                     => array(
-				'label'            => esc_html__('Date Format', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Date Format', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'text',
 				'option_category'  => 'configuration',
-				'description'      => esc_html__('If you would like to adjust the date format, input the appropriate PHP date format here.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('If you would like to adjust the date format, input the appropriate PHP date format here.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default'          => 'M j, Y',
 				'show_if'         => array(
@@ -328,14 +328,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_comments'                 => array(
-				'label'            => esc_html__('Show Comment Count', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Comment Count', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('Turn comment count on and off.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Turn comment count on and off.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'on',
 				'show_if'         => array(
@@ -343,14 +343,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_views'                 => array(
-				'label'            => esc_html__('Show Views Count', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Views Count', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('Turn comment count on and off.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Turn comment count on and off.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'on',
 				'show_if'         => array(
@@ -358,14 +358,14 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'show_categories'               => array(
-				'label'            => esc_html__('Show Categories', 'tp-divi-popular-posts'),
+				'label'            => esc_html__('Show Categories', 'popular-posts-for-divi-with-charts'),
 				'type'             => 'yes_no_button',
 				'option_category'  => 'configuration',
 				'options'          => array(
 					'on'  => et_builder_i18n('Yes'),
 					'off' => et_builder_i18n('No'),
 				),
-				'description'      => esc_html__('Turn the category links on or off.', 'tp-divi-popular-posts'),
+				'description'      => esc_html__('Turn the category links on or off.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug'      => 'post_setting',
 				'default_on_front' => 'off',
 				'show_if'         => array(
@@ -373,9 +373,9 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'post_padding' => array(
-				'label' => esc_html__('Post Padding', 'tp-divi-popular-posts'),
+				'label' => esc_html__('Post Padding', 'popular-posts-for-divi-with-charts'),
 				'type' => 'custom_padding',
-				'description' => esc_html__('Post Padding.', 'tp-divi-popular-posts'),
+				'description' => esc_html__('Post Padding.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug' => 'post_container',
 				'tab_slug' => 'advanced',
 				'show_if'         => array(
@@ -383,9 +383,9 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'post_margin' => array(
-				'label' => esc_html__('Post Margin', 'tp-divi-popular-posts'),
+				'label' => esc_html__('Post Margin', 'popular-posts-for-divi-with-charts'),
 				'type' => 'custom_margin',
-				'description' => esc_html__('Post Margin.', 'tp-divi-popular-posts'),
+				'description' => esc_html__('Post Margin.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug' => 'post_container',
 				'tab_slug' => 'advanced',
 				'show_if'         => array(
@@ -393,9 +393,9 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'post_inner_padding' => array(
-				'label' => esc_html__('Post inner Padding', 'tp-divi-popular-posts'),
+				'label' => esc_html__('Post inner Padding', 'popular-posts-for-divi-with-charts'),
 				'type' => 'custom_padding',
-				'description' => esc_html__('Post inner Padding.', 'tp-divi-popular-posts'),
+				'description' => esc_html__('Post inner Padding.', 'popular-posts-for-divi-with-charts'),
 				'toggle_slug' => 'post_container',
 				'tab_slug' => 'advanced',
 				'show_if'         => array(
@@ -405,7 +405,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				
 			),
 			'post_background_color' => array(
-				'label'           => esc_html__('Background Color', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Background Color', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'color-alpha',
 				'tab_slug'        => 'advanced',
 				'toggle_slug'     => 'post_container',
@@ -414,7 +414,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'image_width' => array(
-				'label'           => esc_html__('Width', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Width', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'range',
 				'tab_slug'        => 'advanced',
 				'toggle_slug'     => 'post_image',
@@ -433,7 +433,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				
 			),
 			'image_min_height' => array(
-				'label'           => esc_html__('Min Height', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Min Height', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'range',
 				'tab_slug'        => 'advanced',
 				'toggle_slug'     => 'post_image',
@@ -452,7 +452,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				
 			),
 			'image_height' => array(
-				'label'           => esc_html__('Height', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Height', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'range',
 				'tab_slug'        => 'advanced',
 				'toggle_slug'     => 'post_image',
@@ -469,7 +469,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 				),
 			),
 			'image_max_height' => array(
-				'label'           => esc_html__('Max Height', 'tp-divi-popular-posts'),
+				'label'           => esc_html__('Max Height', 'popular-posts-for-divi-with-charts'),
 				'type'            => 'range',
 				'tab_slug'        => 'advanced',
 				'toggle_slug'     => 'post_image',
@@ -512,7 +512,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 		$advanced_fields['box_shadow'] = false;
 		$advanced_fields['border'] = false;
 		$advanced_fields['borders']['post_container'] = array(
-			'label_prefix' => esc_html__('Post Container', 'tp-divi-popular-posts'),
+			'label_prefix' => esc_html__('Post Container', 'popular-posts-for-divi-with-charts'),
 			'css'          => array(
 				'main'      => array(
 					'border_radii'  => "{$this->main_css_element} .tp-divi-popular-post",
@@ -528,7 +528,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			'toggle_slug' => 'post_container',
 		);
 		$advanced_fields['fonts']['post_title_link'] = array(
-			'label'    => esc_html__('Post Title Link', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Title Link', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				// Ensure the styles apply to the specific element
 				'main' => "{$this->main_css_element} .tp-post-title a",
@@ -544,7 +544,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 
 		);
 		$advanced_fields['fonts']['post_meta'] = array(
-			'label'    => esc_html__('Post Meta', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Meta', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				'main' => "{$this->main_css_element} .tp-meta-data",
 			),
@@ -558,7 +558,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			'sub_toggle'  => 'p',
 		);
 		$advanced_fields['fonts']['post_meta_link'] = array(
-			'label'    => esc_html__('Post Meta links', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Meta links', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				'main' => "{$this->main_css_element} .tp-meta-data a,{$this->main_css_element} .tp-post-cats a",
 			),
@@ -573,7 +573,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 		);
 
 		$advanced_fields['fonts']['post_body'] = array(
-			'label'    => esc_html__('Post Body', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Body', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				'main' => "{$this->main_css_element} .tp-post-content",
 			),
@@ -587,7 +587,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			'sub_toggle'  => 'p',
 		);
 		$advanced_fields['fonts']['post_body_link'] = array(
-			'label'    => esc_html__('Post Body links', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Body links', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				'main' => "{$this->main_css_element} .tp-post-content a",
 			),
@@ -601,7 +601,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 			'sub_toggle'  => 'a',
 		);
 		$advanced_fields['fonts']['post_body_quote'] = array(
-			'label'    => esc_html__('Post Body quote', 'tp-divi-popular-posts'),
+			'label'    => esc_html__('Post Body quote', 'popular-posts-for-divi-with-charts'),
 			'css'      => array(
 				'main' => "{$this->main_css_element} .tp-post-content blockquote",
 			),
@@ -616,7 +616,7 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 		);
 		$advanced_fields['button'] = array(
 			'button' => array(
-				'label' => esc_html__('Button', 'tp-divi-popular-posts'),
+				'label' => esc_html__('Button', 'popular-posts-for-divi-with-charts'),
 				'css'   => array(
 					'alignment'   => "%%order_class%% .et_pb_button_wrapper",
 					'main' => "{$this->main_css_element} .tp-read-more a",
@@ -640,8 +640,8 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 		static $b = 0;
 		$this->apply_css_styles($attrs, $render_slug, $b, $unique_class);
 		global $wpdb;
-		if (get_option('tp_divi_post_types', [])) {
-			$selected_post_types = get_option('tp_divi_post_types', []);
+		if (get_option('tpdivi_post_types', [])) {
+			$selected_post_types = get_option('tpdivi_post_types', []);
 		} else {
 			echo "Please Select Post Types first from admin settings.";
 		}
@@ -929,4 +929,4 @@ class TP_Popular_Post_Charts extends ET_Builder_Module
 	}
 }
 
-new TP_Popular_Post_Charts;
+new TPDIVI_Popular_Post_Charts;

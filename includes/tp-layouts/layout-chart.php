@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 if ($thumbnail == 'on') {
     $post_thumb = get_the_post_thumbnail_url($postloop->post_id, 'thumbnail');
 }
@@ -28,7 +29,7 @@ if ($thumbnail == 'on') {
     if ('on' === $show_author || 'on' === $show_date || 'on' === $show_categories || 'on' === $show_comments || 'on' === $show_views) {
         $author = 'on' === $show_author
             /* translators: %s: Author */
-            ? et_get_safe_localization(sprintf(__('by %s', 'tp-divi-popular-posts'), '<span class="author vcard">' . $author_data . '</span>'))
+            ? et_get_safe_localization(sprintf(__('by %s', 'popular-posts-for-divi-with-charts'), '<span class="author vcard">' . $author_data . '</span>'))
             : '';
 
         $author_separator = 'on' === $show_author && 'on' === $show_date
@@ -38,7 +39,7 @@ if ($thumbnail == 'on') {
         // phpcs:disable WordPress.WP.I18n.NoEmptyStrings -- intentionally used.
         $date = 'on' === $show_date
             /* translators: %s: Date */
-            ? et_get_safe_localization(sprintf(__('%s', 'tp-divi-popular-posts'), '<span class="published">' . esc_html(get_the_date(str_replace('\\\\', '\\', $meta_date), $postloop->post_id)) . '</span>'))
+            ? et_get_safe_localization(sprintf(__('%s', 'popular-posts-for-divi-with-charts'), '<span class="published">' . esc_html(get_the_date(str_replace('\\\\', '\\', $meta_date), $postloop->post_id)) . '</span>'))
             : '';
         // phpcs:enable
 
@@ -54,26 +55,19 @@ if ($thumbnail == 'on') {
 
         $comments_data = 'on' === $show_comments
             /* translators: %s: Comments */
-            ? et_core_maybe_convert_to_utf_8(sprintf(esc_html(_nx('%s Comment', '%s Comments', get_comments_number($postloop->post_id), 'number of comments', 'tp-divi-popular-posts')), number_format_i18n(get_comments_number($postloop->post_id))))
+            ? et_core_maybe_convert_to_utf_8(sprintf(esc_html(_nx('%s Comment', '%s Comments', get_comments_number($postloop->post_id), 'number of comments', 'popular-posts-for-divi-with-charts')), number_format_i18n(get_comments_number($postloop->post_id))))
             : '';
 
-        printf(
-            '<p class="post-meta">%1$s %2$s %3$s %4$s %5$s %6$s %7$s</p>',
-            //phpcs:ignore
-            et_core_esc_previously($author),
-            //phpcs:ignore
-            et_core_intentionally_unescaped($author_separator, 'fixed_string'),
-            //phpcs:ignore
-            et_core_esc_previously($date),
-            //phpcs:ignore
-            et_core_intentionally_unescaped($date_separator, 'fixed_string'),
-            //phpcs:ignore
-            et_core_esc_previously($comments_data),
-            //phpcs:ignore
-            et_core_intentionally_unescaped($comments_separator, 'fixed_string'),
-            //phpcs:ignore
-            et_core_esc_previously($views_div)
-        );
+            printf(
+                '<p class="post-meta">%1$s %2$s %3$s %4$s %5$s %6$s %7$s</p>',
+                wp_kses_post($author),
+                esc_html($author_separator),
+                wp_kses_post($date),
+                esc_html($date_separator),
+                esc_html($comments_data),
+                esc_html($comments_separator),
+                wp_kses_post($views_div) // Assuming this contains some safe HTML like an icon
+            );
     }
     echo "</div>";
     if ($show_categories == 'on') {

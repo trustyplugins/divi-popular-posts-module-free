@@ -1,4 +1,4 @@
-/* global tp_analytics */
+/* global tpdivi_analytics */
 import React, { Component } from 'react';
 import './style.css';
 import CustomLayout1 from './Layout1'; // Import the custom layout component
@@ -124,13 +124,14 @@ class TpPopularPosts extends Component {
   }
   
   fetchRenderedHTML = () => {
-    //console.log(tp_analytics);
-    const endpoint = `${tp_analytics.site_url}/wp-json/tp/v1/render/`;
+    //console.log(tpdivi_analytics);
+    const endpoint = `${tpdivi_analytics.site_url}/wp-json/tp/v1/render/`;
 
     fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // Send attributes as JSON
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': tpdivi_analytics.nonce, // ✅ Add this line
       },
       body: JSON.stringify({
         attributes: this.props,

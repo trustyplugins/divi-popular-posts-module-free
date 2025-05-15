@@ -1,15 +1,15 @@
-=== Popular Posts for Divi - Free ===
+=== Popular Posts for Divi - Lite ===
 Contributors: TrustyPlugins
 Donate link: https://www.buymeacoffee.com/jasveer
 Tags: divi, popular posts,featured posts,post view
 Requires at least: 5.0
-Tested up to: 6.7.2
+Tested up to: 6.8
 Requires PHP: 7.2
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-count post views and display your popular posts with divi.
+Count post views and display your popular posts with charts and analytics with divi theme.
 
 == Description ==
 
@@ -66,14 +66,41 @@ Before getting started, ensure you have the **Divi Theme** by Elegant Themes ins
 == Frequently Asked Questions ==
 
 = Will it count post views for every post/custom post types? =
-No , we did not count the post views without the settings you set in the admin area. Actually it reduces the load from your database/server.
-Plugin will count the views only for selected posts types. You can set it from the wordpress admin area. Only 'post' is available in the free version , you can check multiple post types in the PRO version.
+No, it will not. The plugin only counts post views for the selected post types that you enable in the admin area. This helps reduce database/server load. In the free version, only 'post' is available. In the PRO version, you can enable multiple post types.
 
-= will it count the post view to every single visit of the user? =
- Yes , but plugin has the option to change this setting from the admin area.
+= Will it count the post view on every single visit of the user? =
+Yes, but the plugin includes settings in the admin area to control and limit view counting behavior.
 
-= Will it work for custom posts types too? =
-No, Free version has only the 'Post' but in the PRO version you can select multiple post types.
+= Will it work for custom post types too? =
+In the free version, only the default 'post' type is supported. The PRO version supports custom post types.
+
+
+
+== Source Code ==
+
+The uncompressed source code for this plugin (including JavaScript and build tools) is publicly available at:
+
+https://github.com/trustyplugins/divi-popular-posts-analytics-module-free
+
+== Build Instructions ==
+
+This plugin uses Parcel as a build tool to compile and bundle JavaScript assets.
+
+To build the plugin from source:
+
+1. Clone the repository:
+   git clone https://github.com/trustyplugins/divi-popular-posts-analytics-module-free
+
+2. Navigate into the plugin folder:
+   cd divi-popular-posts-analytics-module-free
+
+3. Install the required dependencies:
+   npm install
+
+4. Build the assets:
+   npm run build
+
+This will generate the production-ready JavaScript files in the `/js` and `/scripts` directories.
 
 == Upgrade Notice ==
 
